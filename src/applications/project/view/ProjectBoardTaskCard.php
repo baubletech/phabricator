@@ -144,7 +144,7 @@ final class ProjectBoardTaskCard extends Phobject {
 
     $subtype = $task->newSubtypeObject();
     if ($subtype && $subtype->hasTagView()) {
-      $subtype_tag = $subtype->newTagView()
+      $subtype_tag = $subtype->newTagView($this->getViewer())
         ->setSlimShady(true);
       $card->addAttribute($subtype_tag);
     }

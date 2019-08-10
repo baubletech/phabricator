@@ -1,7 +1,9 @@
 <?php
 
-
-final class PhabricatorEditEngineSubtype
+/**
+ * @concrete-extensible
+ */
+class PhabricatorEditEngineSubtype
   extends Phobject {
 
   const SUBTYPE_DEFAULT = 'default';
@@ -14,6 +16,17 @@ final class PhabricatorEditEngineSubtype
   private $childSubtypes = array();
   private $childIdentifiers = array();
   private $fieldConfiguration = array();
+
+  private $object;
+
+  public function getObject() {
+    return $this->object;
+  }
+
+  public function setObject($object) {
+    $this->object = $object;
+    return $this;
+  }
 
   public function setKey($key) {
     $this->key = $key;
@@ -82,7 +95,7 @@ final class PhabricatorEditEngineSubtype
     return (bool)strlen($this->getTagText());
   }
 
-  public function newTagView() {
+  public function newTagView($viewer) {
     $view = id(new PHUITagView())
       ->setType(PHUITagView::TYPE_OUTLINE)
       ->setName($this->getTagText());
@@ -222,6 +235,11 @@ final class PhabricatorEditEngineSubtype
   public static function newSubtypeMap(array $config) {
     $map = array();
 
+    $classmap = id(new PhutilClassMapQuery())
+      ->setAncestorClass(__CLASS__)
+      ->setUniqueMethod('getKey')
+      ->execute();
+
     foreach ($config as $entry) {
       $key = $entry['key'];
       $name = $entry['name'];
@@ -236,7 +254,15 @@ final class PhabricatorEditEngineSubtype
       $color = idx($entry, 'color', 'blue');
       $icon = idx($entry, 'icon', 'fa-drivers-license-o');
 
-      $subtype = id(new self())
+      if (isset($classmap[$key])) {
+        $class = $classmap[$key];
+        $subtype = new $class();
+      } else {
+        $subtype = new self();
+      }
+
+
+      $subtype
         ->setKey($key)
         ->setName($name)
         ->setTagText($tag_text)
