@@ -149,6 +149,7 @@ final class PhabricatorFeedStoryPublisher extends Phobject {
       'FeedPublisherWorker',
       array(
         'key' => $chrono_key,
+        'recipients' => $subscribed_phids
       ));
 
     return $story;

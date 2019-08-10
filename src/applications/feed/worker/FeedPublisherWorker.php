@@ -14,6 +14,7 @@ final class FeedPublisherWorker extends FeedPushWorker {
           array(
             'key' => $story->getChronologicalKey(),
             'uri' => $uri,
+            'recipients' => $this->getTaskData()['recipients']
           ));
       }
     }
