@@ -194,9 +194,10 @@ final class PhabricatorApplicationSearchController
     if ($run_query && !$named_query && $user->isLoggedIn()) {
       $save_button = id(new PHUIButtonView())
         ->setTag('a')
+        ->setColor(PHUIButtonView::GREY)
         ->setHref('/search/edit/key/'.$saved_query->getQueryKey().'/')
         ->setText(pht('Save Query'))
-        ->setIcon('fa-floppy-o');
+        ->setIcon('fa-bookmark');
       $submit->addButton($save_button);
     }
 
@@ -963,8 +964,14 @@ final class PhabricatorApplicationSearchController
 
   private function readExportFormatPreference() {
     $viewer = $this->getViewer();
-    $export_key = PhabricatorPolicyFavoritesSetting::SETTINGKEY;
-    return $viewer->getUserSetting($export_key);
+    $export_key = PhabricatorExportFormatSetting::SETTINGKEY;
+    $value = $viewer->getUserSetting($export_key);
+
+    if (is_string($value)) {
+      return $value;
+    }
+
+    return '';
   }
 
   private function writeExportFormatPreference($value) {
@@ -975,7 +982,7 @@ final class PhabricatorApplicationSearchController
       return;
     }
 
-    $export_key = PhabricatorPolicyFavoritesSetting::SETTINGKEY;
+    $export_key = PhabricatorExportFormatSetting::SETTINGKEY;
     $preferences = PhabricatorUserPreferences::loadUserPreferences($viewer);
 
     $editor = id(new PhabricatorUserPreferencesEditor())
